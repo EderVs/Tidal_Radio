@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 """ Users' views """
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views import View
 
 import tidalapi
 
 from . import forms
 from . import utils
+
 
 class LoginView(View):
     """
@@ -43,7 +45,27 @@ class LoginView(View):
         if user is None:
             # Create new user
             user = User.objects.create_user(username, '', password)
+        login(request, user)
         
         utils.add_tidal_session(username, session)
-        return HttpResponse(str(session.user.id))
+        return redirect('users_profile')
+
+
+class ProfileView(LoginRequiredMixin, View):
+    """
+        User's Profile
+    """
+    
+    def get(self, request):
+        """
+            Get request of Login
+        """
+        session = utils.get_tidal_session(request.user.username)
+        favs = tidalapi.Favorites(session, session.user.id)
+        favs_artists = favs.artists()
+        html = 'users/profile.html'
+        context = {
+            'fav_artists': favs_artists
+        }
+        return render(request, html, context)
 
