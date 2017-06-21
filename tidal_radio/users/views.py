@@ -5,6 +5,8 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
 
+import tidalapi
+
 from . import forms
 
 """
@@ -22,4 +24,16 @@ class LoginView(View):
             'form': form
         }
         return render(request, html, context)
+
+    """
+        Post request of Login
+    """
+    def post(self, request):
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        # Creating a session in tidal api
+        session = tidalapi.Session()
+        # Login
+        session.login(username, password)
+        return HttpResponse(str(session.user.id))
 
