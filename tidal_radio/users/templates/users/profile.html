@@ -14,5 +14,14 @@
 			{% endfor %}
 		</ul>
 	</div>
+	<div>
+		<h2>Artists that you may like</h2>
+		<ul>
+			{% for artist in similar_artists %}
+			<li>{{ artist.name }}</li>
+			<img src="{{ artist.image }}">
+			{% endfor %}
+		</ul>
+	</div>
 </body>
 </html>

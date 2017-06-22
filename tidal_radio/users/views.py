@@ -63,9 +63,13 @@ class ProfileView(LoginRequiredMixin, View):
         session = utils.get_tidal_session(request.user.username)
         favs = tidalapi.Favorites(session, session.user.id)
         favs_artists = favs.artists()
+        similar_artists = utils.get_all_similar_artists_to_favs(
+            request.user.username
+        )
         html = 'users/profile.html'
         context = {
-            'fav_artists': favs_artists
+            'fav_artists': favs_artists[:20],
+            'similar_artists': similar_artists[:20],
         }
         return render(request, html, context)
 
